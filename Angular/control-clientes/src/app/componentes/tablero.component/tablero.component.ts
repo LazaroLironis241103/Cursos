@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
+import { ClientesComponent } from '../clientes.component/clientes.component';
 
 @Component({
-  selector: 'app-tablero.component',
-  imports: [],
+  selector: 'app-tablero',
+  standalone: true,
+  imports: [ClientesComponent],
   templateUrl: './tablero.component.html',
   styleUrl: './tablero.component.css'
 })
