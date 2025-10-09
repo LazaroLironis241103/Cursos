@@ -5,8 +5,8 @@ import { EditarClienteComponent } from './componentes/editar-cliente.component/e
 import { NoEncontradoComponent } from './componentes/no-encontrado.component/no-encontrado.component';
 
 export const routes: Routes = [
-    {path: '', component: TableroComponent}, //localhost:4200
-    {path: 'login', component: LoginComponent},
-    {path: 'cliente/editar/:id', component: EditarClienteComponent},
-    {path: '**', component: NoEncontradoComponent}
+  { path: '', component: TableroComponent },          // localhost:4200
+  { path: 'login', component: LoginComponent },
+  { path: 'editar/:id', component: EditarClienteComponent }, // ruta simplificada
+  { path: '**', component: NoEncontradoComponent }    // siempre al final
 ];

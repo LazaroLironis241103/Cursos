@@ -1,16 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Cliente } from '../modelo/cliente.modelo';
-import { collection, collectionData, Firestore, addDoc, orderBy, query } from '@angular/fire/firestore';
-
-
+import { collection, collectionData, Firestore, addDoc, doc, docData, orderBy, query, updateDoc } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClienteService {
-  clientes: Observable<Cliente[]>;
   private clientesRef;
+  clientes: Observable<Cliente[]>;
 
   constructor(private firestore: Firestore) {
     this.clientesRef = collection(this.firestore, 'clientes');
@@ -23,6 +21,17 @@ export class ClienteService {
   }
 
   agregarCliente(cliente: Cliente) {
-    return addDoc(this.clientesRef, cliente);
+    return addDoc(this.clientesRef, cliente); // Promise<DocumentReference>
+  }
+
+  getCliente(id: string): Observable<Cliente | null> {
+    const clienteDocRef = doc(this.firestore, `clientes/${id}`);
+    return docData(clienteDocRef, { idField: 'id' }) as Observable<Cliente>;
+  }
+
+  actualizarCliente(id: string, cliente: Cliente) {
+    const clienteDocRef = doc(this.firestore, `clientes/${id}`);
+    const { id: _, ...clienteData } = cliente; // elimina id antes de actualizar
+    return updateDoc(clienteDocRef, clienteData);
   }
 }

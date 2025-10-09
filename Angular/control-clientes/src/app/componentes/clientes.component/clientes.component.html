@@ -1,156 +1,88 @@
-<!-- Botones -->
-<section id="actions" class="py-4 mb-4">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-3">
-                <a href="#" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#agregarClienteModal">
-                    <i class="bi bi-plus-circle"></i> Agregar Cliente
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Listado CLientes -->
 <section id="clientes">
-    <div class="conatiner">
-        <div class="row">
-            <div class="col-md-9">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Listado de Clientes</h4>
-                    </div>
-                    <table class="table table-striped">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Saldo</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Iterar sobre la lista de clientes -->
-                            @for(cliente of clientes; track cliente) {
-                            <tr>
-                                <td>{{cliente.nombre}} {{cliente.apellido}}</td>
-                                <td>{{cliente.saldo | currency: 'ARS': '$'}}</td>
-                                <td>
-                                    <a routerLink="'/cliente/editar/{{cliente.id}}" class="btn btn-secondary">
-                                        <i class="bi bi-pencil-square"></i> Editar
-                                    </a>
-                                </td>
-                            </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <!-- Tarjetas Laterales -->
-             <div class="col-md-3">
-                <!-- Primera tarjeta -->
-                <div class="card text-center bg-danger text-white mb-3">
-                    <div class="card-body">
-                        <h3>Saldo Total</h3>
-                        <h4 class="display-4">
-                            {{getSaldoTotal() | currency: 'ARS': '$'}}
-                        </h4>
-                    </div>
-                </div>
-                <!-- Segunda tarjeta -->
-                 <div class="card text-center bg-success text-white mb-3">
-                    <div class="card-body">
-                        <h3>Total Clientes</h3>
-                        <h4 class="display-4">
-                            <i class="bi bi-people-fill"></i> {{clientes?.length}}
-                        </h4>
-                    </div>
-                 </div>
-             </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-9">
+        <div class="card">
+          <div class="card-header">
+            <h4>Listado de Clientes</h4>
+          </div>
+          <table class="table table-striped">
+            <thead class="table-dark">
+              <tr>
+                <th>Nombre</th>
+                <th>Saldo</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let cliente of clientes; trackBy: trackByClienteId">
+                <td>{{ cliente.nombre }} {{ cliente.apellido }}</td>
+                <td>{{ cliente.saldo | currency:'ARS':'$' }}</td>
+                <td>
+                  <!-- Solo mostrar el botón si existe id -->
+                  <a *ngIf="cliente.id" [routerLink]="['/cliente/editar', cliente.id]" class="btn btn-secondary">
+                    <i class="bi bi-pencil-square"></i> Editar
+                  </a>
+                  <span *ngIf="!cliente.id" class="text-muted">Sin ID</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+      </div>
+
+      <!-- Tarjetas Laterales -->
+      <div class="col-md-3">
+        <div class="card text-center bg-danger text-white mb-3">
+          <div class="card-body">
+            <h3>Saldo Total</h3>
+            <h4 class="display-4">{{ getSaldoTotal() | currency:'ARS':'$' }}</h4>
+          </div>
+        </div>
+        <div class="card text-center bg-success text-white mb-3">
+          <div class="card-body">
+            <h3>Total Clientes</h3>
+            <h4 class="display-4">
+              <i class="bi bi-people-fill"></i> {{ clientes.length }}
+            </h4>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </section>
 
-<!-- Modal para Agregar Cliente -->
- <div class="modal fade" id="agregarClienteModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <!-- Encabezado del Modal -->
-             <div class="modal-header bg-info text-white">
-                <h5 class="modal-title">Agregar Cliente</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                #botonCerrar>
-                </button>
-             </div>
-             <!-- Formulario par4a agregar cliente -->
-              <form #clienteForm="ngForm" (ngSubmit)="agregar(clienteForm)">
-                <div class="modal-body">
-                    <!-- Campo nombre -->
-                    <div class="d-flex align-items-center mb-3">
-                        <label for="nombre" class="form-label me-3" style="min-width: 100px">Nombre
-                        </label>
-                        <div class="col-sm-9">
-                            <input type="text" id="nombre" name="nombre" class="form-control" required
-                            minlength="2" [(ngModel)]="cliente.nombre" #nombre="ngModel"/>
-                            @if(nombre.invalid && nombre.touched) {
-                                <div class="text-danger">
-                                    Nombre es requerido y debe tener al menos 2 caracteres.
-                                </div>
-                            }
-                        </div>
-                    </div>
-
-                    <!-- Campo apellido -->
-                    <div class="d-flex align-items-center mb-3">
-                        <label for="apellido" class="form-label me-3" style="min-width: 100px">Apellido
-                        </label>
-                        <div class="col-sm-9">
-                             <input type="text" id="apellido" name="apellido" class="form-control" required
-                             minlength="2" [(ngModel)]="cliente.apellido" #apellido="ngModel"/>
-                            @if(apellido.invalid && apellido.touched) {
-                                <div class="text-danger">
-                                    Apellido es requerido y debe tener al menos 2 caracteres.
-                                </div>
-                            }
-                        </div>
-                    </div>
-
-                    <!-- Campo email -->
-                    <div class="d-flex align-items-center mb-3">
-                        <label for="email" class="form-label me-3" style="min-width: 100px">Email
-                        </label>
-                        <div class="col-sm-9">
-                            <input type="email" id="email" name="email" class="form-control" required
-                            [(ngModel)]="cliente.email" #email="ngModel"/>
-                            @if(email.invalid && email.touched) {
-                                <div class="text-danger">
-                                    Por favor ingresa un email valido.
-                                </div>
-                            }
-                        </div>
-                    </div>
-
-                    <!-- Campo saldo -->
-                    <div class="d-flex align-items-center mb-3">
-                        <label for="saldo" class="form-label me-3" style="min-width: 100px">Saldo
-                        </label>
-                        <div class="col-sm-9">
-                            <input type="number" id="saldo" name="saldo" class="form-control" required
-                            min="0.01" step="0.01" [(ngModel)]="cliente.saldo" #saldo="ngModel"/>
-                            @if(saldo.invalid && saldo.touched) {
-                                <div class="text-danger">
-                                    El saldo es requerido y debe ser un numero positivo.
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-                <!-- Footer del modal con el boton de guardar -->
-                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary"
-                    [disabled]="clienteForm.invalid"
-                    >Guardar</button>
-                 </div>
-              </form>
+<!-- Modal agregar cliente -->
+<div class="modal fade" id="agregarClienteModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">Agregar Cliente</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" #botonCerrar></button>
+      </div>
+      <form #clienteForm="ngForm" (ngSubmit)="agregar(clienteForm)">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label>Nombre</label>
+            <input type="text" class="form-control" name="nombre" required [(ngModel)]="cliente.nombre">
+          </div>
+          <div class="mb-3">
+            <label>Apellido</label>
+            <input type="text" class="form-control" name="apellido" required [(ngModel)]="cliente.apellido">
+          </div>
+          <div class="mb-3">
+            <label>Email</label>
+            <input type="email" class="form-control" name="email" required [(ngModel)]="cliente.email">
+          </div>
+          <div class="mb-3">
+            <label>Saldo</label>
+            <input type="number" class="form-control" name="saldo" min="0.01" step="0.01" required [(ngModel)]="cliente.saldo">
+          </div>
         </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" [disabled]="clienteForm.invalid">Guardar</button>
+        </div>
+      </form>
     </div>
- </div>
+  </div>
+</div>
