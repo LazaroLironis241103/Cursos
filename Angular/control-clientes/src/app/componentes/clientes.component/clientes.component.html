@@ -19,10 +19,9 @@
                 <td>{{ cliente.nombre }} {{ cliente.apellido }}</td>
                 <td>{{ cliente.saldo | currency:'ARS':'$' }}</td>
                 <td>
-                  <!-- Solo mostrar el botón si existe id -->
-                  <a *ngIf="cliente.id" [routerLink]="['/cliente/editar', cliente.id]" class="btn btn-secondary">
+                  <button *ngIf="cliente.id" type="button" class="btn btn-secondary" (click)="irAEditar(cliente)">
                     <i class="bi bi-pencil-square"></i> Editar
-                  </a>
+                  </button>
                   <span *ngIf="!cliente.id" class="text-muted">Sin ID</span>
                 </td>
               </tr>
@@ -31,7 +30,6 @@
         </div>
       </div>
 
-      <!-- Tarjetas Laterales -->
       <div class="col-md-3">
         <div class="card text-center bg-danger text-white mb-3">
           <div class="card-body">

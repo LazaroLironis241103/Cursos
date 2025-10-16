@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Cliente } from '../../modelo/cliente.modelo';
 import { ClienteService } from '../../servicios/cliente.service';
 import { CommonModule } from '@angular/common';
@@ -17,16 +18,26 @@ export class ClientesComponent implements OnInit {
 
   @ViewChild('botonCerrar') botonCerrar!: ElementRef;
 
-  constructor(private clienteServicio: ClienteService) {}
+  constructor(
+    private clienteServicio: ClienteService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.clienteServicio.getClientes().subscribe(clientes => {
-      // Asegurarse que todos los clientes tengan id
-      this.clientes = clientes.map(c => ({
-        ...c,
-        id: c.id ?? ''  // Si algún cliente no tiene id, le ponemos string vacío
-      }));
+      // Mantener solo clientes con id válido
+      this.clientes = clientes.filter(c => !!c.id);
+      console.log('Clientes cargados (con id):', this.clientes);
     });
+  }
+
+  irAEditar(cliente: Cliente) {
+    if (!cliente?.id) {
+      console.warn('Intento de editar cliente sin id', cliente);
+      return;
+    }
+    console.log('Navegando a editar con id:', cliente.id);
+    this.router.navigate(['/editar', cliente.id]);
   }
 
   getSaldoTotal(): number {
@@ -36,8 +47,8 @@ export class ClientesComponent implements OnInit {
   agregar(clienteForm: NgForm) {
     const { value } = clienteForm;
     this.clienteServicio.agregarCliente(value).then(docRef => {
-      value.id = docRef.id; // asignamos id de Firebase
-      this.clientes.push(value); // agregamos a la lista local
+      value.id = docRef.id;
+      this.clientes.push(value);
       clienteForm.resetForm();
       this.cerrarModal();
     });
