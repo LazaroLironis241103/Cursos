@@ -25,18 +25,12 @@ export class ClientesComponent implements OnInit {
 
   ngOnInit(): void {
     this.clienteServicio.getClientes().subscribe(clientes => {
-      // Mantener solo clientes con id válido
       this.clientes = clientes.filter(c => !!c.id);
-      console.log('Clientes cargados (con id):', this.clientes);
     });
   }
 
   irAEditar(cliente: Cliente) {
-    if (!cliente?.id) {
-      console.warn('Intento de editar cliente sin id', cliente);
-      return;
-    }
-    console.log('Navegando a editar con id:', cliente.id);
+    if (!cliente?.id) return;
     this.router.navigate(['/editar', cliente.id]);
   }
 
