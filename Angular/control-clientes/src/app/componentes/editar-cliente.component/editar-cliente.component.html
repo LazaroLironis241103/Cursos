@@ -5,35 +5,99 @@
 </header>
 
 <div class="container mt-4" *ngIf="!cargando; else cargandoTpl">
-  <form #clienteForm="ngForm" (ngSubmit)="guardar(clienteForm)">
+  <form #clienteForm="ngForm" (ngSubmit)="guardar(clienteForm)" novalidate>
     <div class="mb-3">
       <label for="nombre" class="form-label">Nombre</label>
-      <input type="text" id="nombre" name="nombre" [(ngModel)]="cliente.nombre" class="form-control" required />
+      <input
+        type="text"
+        id="nombre"
+        name="nombre"
+        [(ngModel)]="cliente.nombre"
+        class="form-control"
+        required
+        #nombre="ngModel"
+      />
+      <div *ngIf="nombre.invalid && nombre.touched" class="text-danger small">
+        El nombre es obligatorio.
+      </div>
     </div>
+
     <div class="mb-3">
       <label for="apellido" class="form-label">Apellido</label>
-      <input type="text" id="apellido" name="apellido" [(ngModel)]="cliente.apellido" class="form-control" required />
+      <input
+        type="text"
+        id="apellido"
+        name="apellido"
+        [(ngModel)]="cliente.apellido"
+        class="form-control"
+        required
+        #apellido="ngModel"
+      />
+      <div *ngIf="apellido.invalid && apellido.touched" class="text-danger small">
+        El apellido es obligatorio.
+      </div>
     </div>
+
     <div class="mb-3">
       <label for="email" class="form-label">Email</label>
-      <input type="email" id="email" name="email" [(ngModel)]="cliente.email" class="form-control" required />
+      <input
+        type="email"
+        id="email"
+        name="email"
+        [(ngModel)]="cliente.email"
+        class="form-control"
+        required
+        email
+        #email="ngModel"
+      />
+      <div *ngIf="email.invalid && email.touched" class="text-danger small">
+        Ingresá un email válido.
+      </div>
     </div>
+
     <div class="mb-3">
       <label for="saldo" class="form-label">Saldo</label>
-      <input type="number" id="saldo" name="saldo" [(ngModel)]="cliente.saldo" class="form-control" />
+      <input
+        type="number"
+        id="saldo"
+        name="saldo"
+        [(ngModel)]="cliente.saldo"
+        class="form-control"
+        step="0.01"
+        #saldo="ngModel"
+      />
+      <div *ngIf="saldo.invalid && saldo.touched" class="text-danger small">
+        Ingresá un saldo válido.
+      </div>
     </div>
 
     <section id="actions" class="py-4 mb-4">
       <div class="container d-flex justify-content-between">
-        <a [routerLink]="['/']" class="btn btn-primary">
+        <a
+          [routerLink]="['/']"
+          class="btn btn-primary"
+          [attr.aria-disabled]="cargando || eliminando"
+          [class.disabled]="cargando || eliminando"
+        >
           <i class="bi bi-arrow-left"></i> Regresar al inicio
         </a>
-        <button type="submit" class="btn btn-success">
+
+        <button
+          type="submit"
+          class="btn btn-success"
+          [disabled]="cargando || eliminando || clienteForm.invalid"
+        >
           <i class="bi bi-check"></i> Guardar Cliente
         </button>
-        <a href="#" (click)="eliminar()" class="btn btn-danger">
+
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="eliminar()"
+          [disabled]="cargando || eliminando"
+        >
           <i class="bi bi-trash"></i> Eliminar Cliente
-        </a>
+        </button>
       </div>
     </section>
   </form>

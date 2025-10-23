@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Cliente } from '../../modelo/cliente.modelo';
 import { ClienteService } from '../../servicios/cliente.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-editar-cliente',
@@ -22,6 +21,7 @@ export class EditarClienteComponent implements OnInit {
   cliente: Cliente = { nombre: '', apellido: '', email: '', saldo: 0 };
   id: string | null = null;
   cargando = true;
+  eliminando = false;
 
   constructor(
     private clienteServicio: ClienteService,
@@ -35,7 +35,6 @@ export class EditarClienteComponent implements OnInit {
       console.log('EditarClienteComponent param id:', this.id);
 
       if (!this.id) {
-        // Volver al listado en lugar de navegar a una ruta inexistente
         this.router.navigate(['/']);
         return;
       }
@@ -43,10 +42,11 @@ export class EditarClienteComponent implements OnInit {
       this.cargando = true;
       this.clienteServicio.getCliente(this.id).subscribe(cliente => {
         if (cliente) {
-          this.cliente = cliente;
+          // Asegurar que saldo sea número
+          const saldoNum = Number((cliente as any).saldo || 0);
+          this.cliente = { ...cliente, saldo: isNaN(saldoNum) ? 0 : saldoNum };
           this.cargando = false;
         } else {
-          // Cliente no encontrado: volver al listado
           this.router.navigate(['/']);
         }
       }, err => {
@@ -57,24 +57,48 @@ export class EditarClienteComponent implements OnInit {
   }
 
   guardar(clienteForm: NgForm) {
-    if (!this.id) return;
-    this.clienteServicio.actualizarCliente(this.id, this.cliente).then(() => {
-      this.router.navigate(['/']);
-    }).catch(err => {
-      console.error('Error guardando cliente:', err);
-    });
+    if (!this.id) {
+      console.error('Guardar: id ausente');
+      alert('No se pudo guardar: id inválido.');
+      return;
+    }
+
+    // Forzar parseo del saldo a número
+    const payload = { ...this.cliente, saldo: Number(this.cliente.saldo || 0) };
+
+    this.clienteServicio.actualizarCliente(this.id, payload)
+      .then(() => {
+        console.log('Cliente guardado:', this.id);
+        this.router.navigate(['/']);
+      })
+      .catch(err => {
+        console.error('Error guardando cliente:', err);
+        alert('Ocurrió un error al guardar el cliente.');
+      });
   }
 
   eliminar() {
-    if (confirm('¿Seguro que deseas eliminar el cliente?')) {
-      this.clienteServicio.eliminarCliente(this.id!)
-        .then(() => {
-          this.router.navigate(['/']); // solo navega cuando se confirma que se eliminó
-        })
-        .catch(err => {
-          console.error('Error al eliminar cliente:', err);
-          alert('Ocurrió un error al eliminar el cliente.');
-        });
+    if (!this.id) {
+      console.error('Eliminar: id ausente');
+      alert('No se pudo eliminar: id inválido.');
+      return;
     }
+
+    if (!confirm('¿Seguro que deseas eliminar el cliente?')) return;
+
+    console.log('Intentando eliminar cliente id:', this.id);
+    this.eliminando = true;
+
+    this.clienteServicio.eliminarCliente(this.id)
+      .then(() => {
+        console.log('Cliente eliminado correctamente:', this.id);
+        this.eliminando = false;
+        this.router.navigate(['/']);
+      })
+      .catch(err => {
+        console.error('Error al eliminar cliente', this.id, err);
+        this.eliminando = false;
+        alert('Ocurrió un error al eliminar el cliente. Revisa la consola.');
+      });
   }
 }

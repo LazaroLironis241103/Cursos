@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "control-clientes-34ae2"
-  }
+    "default": "control-clientes-34ae2",
+    "prod": "control-clientes-34ae2"
+  },
+  "targets": {},
+  "etags": {}
 }
